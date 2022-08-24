@@ -41,6 +41,21 @@ describe("t-on", () => {
     expect(steps).toEqual(["click"]);
   });
 
+  test("t-on when first component child is an empty component", async () => {
+    const consoleSpy = jest.spyOn(console, "error");
+    class Child extends Component {
+      static template = xml`<span t-foreach="props.list" t-as="c" t-key="c_index"/>`;
+    }
+    class Parent extends Component {
+      static template = xml`<div><Child list="[]" t-on-click="() => {}"/></div>`;
+      static components = { Child };
+    }
+    const parent = await mount(Parent, fixture);
+    const el = elem(parent);
+    el.click();
+    expect(consoleSpy).not.toHaveBeenCalled();
+  });
+
   test("t-on expression in t-foreach", async () => {
     class Comp extends Component {
       static template = xml`
